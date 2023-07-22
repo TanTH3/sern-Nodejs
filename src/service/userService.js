@@ -41,7 +41,7 @@ let handleUserLogin = (email, password) => {
                     }
                 } else {
                     userData.errCode = 2;
-                    userData.errMessage = `User;s not found`;
+                    userData.errMessage = `User's not found`;
                 }
             } else {
                 userData.errCode = 1;
@@ -127,8 +127,61 @@ let createNewUser = (data) => {
         }
     });
 };
+
+let deleteUser = (id) => {
+    return new Promise(async (res, rej) => {
+        let user = await db.User.findOne({
+            where: { id },
+        });
+        if (!user) {
+            res({
+                errCode: 2,
+                errMessage: `the user isn't exist`,
+            });
+        }
+        await user.destroy();
+        res({
+            errCode: 0,
+            message: `the user isn't deleted`,
+        });
+    });
+};
+
+let editUser = (data) => {
+    return new Promise(async (res, rej) => {
+        try {
+            let user = await db.User.findOne({
+                where: { id: data.id },
+            });
+            if (user) {
+                user.firstName = data.firstName;
+                user.lastName = data.lastName;
+                user.address = data.address;
+
+                await user.save();
+
+                res({
+                    errCode: 0,
+                    errMessage: 'update succeeds',
+                });
+            } else {
+                res({
+                    errCode: 1,
+                    errMessage: `user's not found`,
+                });
+            }
+        } catch (e) {
+            rej({
+                errCode: 1,
+                errMessage: `user's not found`,
+            });
+        }
+    });
+};
 module.exports = {
     handleUserLogin,
     getAllUsers,
     createNewUser,
+    deleteUser,
+    editUser,
 };

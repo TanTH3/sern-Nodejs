@@ -40,8 +40,24 @@ let handleGetAllUser = async (req, res) => {
 };
 
 let handleCreateNewUser = async (req, res) => {
+    console.log(req.body);
     let message = await userService.createNewUser(req.body);
     console.log(message);
+    return res.status(200).json(message);
+};
+
+let handleDeleteUser = async (req, res) => {
+    if (!req.body.id) {
+        return res.status(200).json({
+            errCode: 1,
+            errMessage: 'missing required !',
+        });
+    }
+    let message = await userService.deleteUser(req.body.id);
+    return res.status(200).json(message);
+};
+let handleEditUser = async (req, res) => {
+    let message = await userService.editUser(req.body);
     return res.status(200).json(message);
 };
 
@@ -49,4 +65,6 @@ module.exports = {
     handleLogin,
     handleGetAllUser,
     handleCreateNewUser,
+    handleDeleteUser,
+    handleEditUser,
 };

@@ -23,7 +23,7 @@ let handleUserLogin = (email, password) => {
             if (isExit) {
                 // user already exits
                 let user = await db.User.findOne({
-                    attributes: ['email', 'roleId', 'password'],
+                    attributes: ['email', 'roleId', 'password', 'firstName', 'lastName'],
                     where: { email: email },
                     raw: true,
                 });
@@ -37,7 +37,7 @@ let handleUserLogin = (email, password) => {
                         userData.user = user;
                     } else {
                         userData.errCode = 3;
-                        userData.errMessage = 'Wrong psas';
+                        userData.errMessage = 'Wrong password';
                     }
                 } else {
                     userData.errCode = 2;

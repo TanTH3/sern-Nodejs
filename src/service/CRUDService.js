@@ -13,7 +13,7 @@ let createNewUser = async (data) => {
                 firstName: data.firstName,
                 lastName: data.lastName,
                 address: data.address,
-                gender: data.gender === '1' ? true : false,
+                gender: data.gender,
                 roleId: data.role,
                 phoneNumber: data.phoneNumber,
             });
@@ -69,6 +69,12 @@ let getUserInfoById = (userId) => {
 let updateUserData = (data) => {
     return new Promise(async (res, rej) => {
         try {
+            if (!data.id || !data.roleId || !data.positionId || !data.gender) {
+                res({
+                    errCode: 2,
+                    errMessage: 'Missing ',
+                });
+            }
             let user = await db.User.findOne({
                 where: { id: data.id },
             });
@@ -76,6 +82,13 @@ let updateUserData = (data) => {
                 user.firstName = data.firstName;
                 user.lastName = data.lastName;
                 user.address = data.address;
+                user.roleId = data.roleId;
+                user.positionId = data.positionId;
+                user.gender = data.gender;
+                user.phoneNumber = data.phoneNumber;
+                if (data.avatar) {
+                    user.image = data.avatar;
+                }
 
                 await user.save();
 

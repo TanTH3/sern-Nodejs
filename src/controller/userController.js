@@ -40,7 +40,7 @@ let handleGetAllUser = async (req, res) => {
 };
 
 let handleCreateNewUser = async (req, res) => {
-    console.log(req.body);
+    console.log(123, req.body);
     let message = await userService.createNewUser(req.body);
     console.log(message);
     return res.status(200).json(message);
@@ -57,14 +57,17 @@ let handleDeleteUser = async (req, res) => {
     return res.status(200).json(message);
 };
 let handleEditUser = async (req, res) => {
+    await console.log(req.body);
     let message = await userService.editUser(req.body);
     return res.status(200).json(message);
 };
 let getAllCode = async (req, res) => {
+    console.log('1223', req.query.type);
     try {
         let data = await userService.getAllCodeService(req.query.type);
         return res.status(200).json(data);
     } catch (e) {
+        console.log(e);
         return res.status(200).json({
             errCode: -1,
             errMessage: 'Error from server',

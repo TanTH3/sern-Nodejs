@@ -1,4 +1,3 @@
-import e from 'express';
 import db from '../models/index';
 import bcrypt from 'bcryptjs';
 
@@ -99,7 +98,14 @@ let getAllUsers = (userId) => {
 
 let createNewUser = (data) => {
     return new Promise(async (res, rej) => {
+        console.log(456, data);
         try {
+            if (!data.roleId || !data.positionId || !data.gender) {
+                res({
+                    errCode: 2,
+                    errMessage: 'Missing ',
+                });
+            }
             let check = await checkUserEmail(data.email);
             if (check === true) {
                 res({
@@ -114,9 +120,11 @@ let createNewUser = (data) => {
                     firstName: data.firstName,
                     lastName: data.lastName,
                     address: data.address,
-                    gender: data.gender === '1' ? true : false,
-                    roleId: data.role,
+                    gender: data.gender,
+                    roleId: data.roleId,
                     phoneNumber: data.phoneNumber,
+                    positionId: data.positionId,
+                    image: data.avatar,
                 });
                 res({
                     errCode: 0,
@@ -158,7 +166,13 @@ let editUser = (data) => {
                 user.firstName = data.firstName;
                 user.lastName = data.lastName;
                 user.address = data.address;
-
+                user.roleId = data.roleId;
+                user.positionId = data.positionId;
+                user.gender = data.gender;
+                user.phoneNumber = data.phoneNumber;
+                if (data.avatar) {
+                    user.image = data.avatar;
+                }
                 await user.save();
 
                 res({
@@ -190,7 +204,7 @@ let getAllCodeService = (typeInput) => {
                 });
             } else {
                 let res = {};
-                let allcode = await db.Allcodes.findAll({
+                let allcode = await db.Allcode.findAll({
                     where: { type: typeInput },
                 });
                 res.errCode = 0;

@@ -50,7 +50,90 @@ let getAllDoctors = () => {
         }
     });
 };
+let saveInfoDoctorService = (inputData) => {
+    return new Promise(async (res, rej) => {
+        try {
+            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown || !inputData.action) {
+                res({
+                    errCode: 1,
+                    errMessage: 'Missing parameter',
+                });
+            } else {
+                if (inputData.action === 'CREATE') {
+                    await db.Markdown.create({
+                        contentHTML: inputData.contentHTML,
+                        contentMarkdown: inputData.contentMarkdown,
+                        description: inputData.description,
+                        doctorId: inputData.doctorId,
+                    });
+                } else if (inputData.action === 'EDIT') {
+                    let doctorMarkdown = await db.Markdown.findOne({
+                        where: { doctorId: inputData.doctorId },
+                        raw: false,
+                    });
+                    if (doctorMarkdown) {
+                        (doctorMarkdown.contentHTML = inputData.contentHTML),
+                            (doctorMarkdown.contentMarkdown = inputData.contentMarkdown),
+                            (doctorMarkdown.description = inputData.description),
+                            (doctorMarkdown.updateAt = new Date());
+
+                        await doctorMarkdown.save();
+                    }
+                }
+            }
+
+            res({
+                errCode: 0,
+                errMessage: 'Save info Doctor',
+            });
+        } catch (e) {
+            rej(e);
+        }
+    });
+};
+let getDetailDoctorByIdService = (id) => {
+    return new Promise(async (res, rej) => {
+        let data = [];
+        try {
+            if (!id) {
+                res({
+                    errCode: 1,
+                    errMessage: 'Missing parameter',
+                });
+            } else {
+                data = await db.User.findOne({
+                    where: { id },
+                    attributes: {
+                        exclude: ['password'],
+                    },
+                    include: [
+                        {
+                            model: db.Markdown,
+                            attributes: ['description', 'contentHTML', 'contentMarkdown'],
+                        },
+                        { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
+                    ],
+                    raw: false,
+                    nest: true,
+                });
+
+                if (data && data.image) {
+                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                }
+                if (!data) data = {};
+                res({
+                    errCode: 0,
+                    data,
+                });
+            }
+        } catch (e) {
+            rej(e);
+        }
+    });
+};
 module.exports = {
     getTopDoctorHomeService,
     getAllDoctors,
+    saveInfoDoctorService,
+    getDetailDoctorByIdService,
 };

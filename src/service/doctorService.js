@@ -106,8 +106,8 @@ let saveInfoDoctorService = (inputData) => {
                 if (doctorInfo) {
                     (doctorInfo.doctorId = inputData.doctorId),
                         (doctorInfo.priceId = inputData.selectedPrice),
-                        (doctorInfo.province = inputData.selectedProvince),
                         (doctorInfo.payment = inputData.selectedPayment),
+                        (doctorInfo.province = inputData.selectedProvince),
                         (doctorInfo.nameClinic = inputData.nameClinic),
                         (doctorInfo.addressClinic = inputData.addressClinic),
                         (doctorInfo.note = inputData.note);
@@ -117,19 +117,18 @@ let saveInfoDoctorService = (inputData) => {
                     await db.Doctor_Info.create({
                         doctorId: inputData.doctorId,
                         priceId: inputData.selectedPrice,
-                        province: inputData.selectedProvince,
-                        payment: inputData.selectedPayment,
+                        provinceId: inputData.selectedProvince,
+                        paymentId: inputData.selectedPayment,
                         nameClinic: inputData.nameClinic,
                         addressClinic: inputData.addressClinic,
                         note: inputData.note,
                     });
                 }
+                res({
+                    errCode: 0,
+                    errMessage: 'Save info Doctor',
+                });
             }
-
-            res({
-                errCode: 0,
-                errMessage: 'Save info Doctor',
-            });
         } catch (e) {
             rej(e);
         }
@@ -151,6 +150,23 @@ let getDetailDoctorByIdService = (id) => {
                         exclude: ['password'],
                     },
                     include: [
+                        {
+                            model: db.Doctor_Info,
+                            attributes: [
+                                'priceId',
+                                'paymentId',
+                                'provinceId',
+                                'addressClinic',
+                                'nameClinic',
+                                'note',
+                                'count',
+                            ],
+                            include: [
+                                { model: db.Allcode, as: 'priceTypeData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'provinceTypeData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'paymentTypeData', attributes: ['valueEn', 'valueVi'] },
+                            ],
+                        },
                         {
                             model: db.Markdown,
                             attributes: ['description', 'contentHTML', 'contentMarkdown'],
@@ -234,7 +250,10 @@ let getScheduleByDateService = (doctorId, date) => {
                         doctorId,
                         date,
                     },
-                    include: [{ model: db.Allcode, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] }],
+                    include: [
+                        { model: db.Allcode, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.User, as: 'doctorData', attributes: ['firstName', 'lastName'] },
+                    ],
                     raw: false,
                     nest: true,
                 });
@@ -250,6 +269,95 @@ let getScheduleByDateService = (doctorId, date) => {
         }
     });
 };
+
+let getExtraInfoDoctorByIdService = (doctorId) => {
+    return new Promise(async (res, rej) => {
+        try {
+            if (!doctorId) {
+                res({
+                    errCode: 1,
+                    errMessage: 'Missing required param !',
+                });
+            } else {
+                let data = await db.Doctor_Info.findOne({
+                    where: {
+                        doctorId,
+                    },
+                    attributes: {
+                        exclude: ['id', 'doctorId'],
+                    },
+                    include: [
+                        { model: db.Allcode, as: 'priceTypeData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'provinceTypeData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'paymentTypeData', attributes: ['valueEn', 'valueVi'] },
+                    ],
+                    raw: false,
+                    nest: true,
+                });
+                if (!data) data = {};
+
+                res({
+                    errCode: 0,
+                    data,
+                });
+            }
+        } catch (e) {
+            rej(e);
+        }
+    });
+};
+let getProfileDoctorByIdService = (doctorId) => {
+    return new Promise(async (res, rej) => {
+        try {
+            if (!doctorId) {
+                res({
+                    errCode: 1,
+                    errMessage: 'Missing required param !',
+                });
+            } else {
+                let data = await db.User.findOne({
+                    where: {
+                        id: doctorId,
+                    },
+                    attributes: {
+                        exclude: ['password'],
+                    },
+                    include: [
+                        {
+                            model: db.Markdown,
+                            attributes: ['description', 'contentHTML', 'contentMarkdown'],
+                        },
+                        { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
+                        {
+                            model: db.Doctor_Info,
+                            attributes: {
+                                exclude: ['id', 'doctorId'],
+                            },
+                            include: [
+                                { model: db.Allcode, as: 'priceTypeData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'provinceTypeData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'paymentTypeData', attributes: ['valueEn', 'valueVi'] },
+                            ],
+                        },
+                    ],
+                    raw: false,
+                    nest: true,
+                });
+                if (data && data.image) {
+                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                }
+                if (!data) data = {};
+
+                res({
+                    errCode: 0,
+                    data,
+                });
+            }
+        } catch (e) {
+            rej(e);
+        }
+    });
+};
 module.exports = {
     getTopDoctorHomeService,
     getAllDoctors,
@@ -257,4 +365,6 @@ module.exports = {
     getDetailDoctorByIdService,
     bulkCreateScheduleService,
     getScheduleByDateService,
+    getExtraInfoDoctorByIdService,
+    getProfileDoctorByIdService,
 };

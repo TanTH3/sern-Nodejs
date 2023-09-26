@@ -10,7 +10,12 @@ module.exports = {
             },
             doctorId: {
                 allowNull: false,
-
+                type: Sequelize.INTEGER,
+            },
+            specialtyId: {
+                type: Sequelize.INTEGER,
+            },
+            clinicId: {
                 type: Sequelize.INTEGER,
             },
             priceId: {

@@ -1,19 +1,26 @@
 import db from '../models/index';
 
-let createSpecialtyService = (data) => {
+let createClinicService = (data) => {
     return new Promise(async (res, rej) => {
         try {
-            if (!data.name || !data.descriptionHTML || !data.descriptionMarkdown) {
+            if (
+                !data.name ||
+                !data.descriptionHTML ||
+                !data.descriptionMarkdown ||
+                !data.address ||
+                !data.imageBase64
+            ) {
                 res({
                     errCode: 1,
                     errMessage: 'Missing Parameter',
                 });
             } else {
-                await db.Specialty.create({
+                await db.Clinic.create({
                     name: data.name,
                     image: data.imageBase64,
                     descriptionHTML: data.descriptionHTML,
                     descriptionMarkdown: data.descriptionMarkdown,
+                    address: data.address,
                 });
                 res({
                     errCode: 0,
@@ -27,10 +34,10 @@ let createSpecialtyService = (data) => {
     });
 };
 
-let getAllSpecialtyService = () => {
+let getAllClinicService = () => {
     return new Promise(async (res, rej) => {
         try {
-            let data = await db.Specialty.findAll({});
+            let data = await db.Clinic.findAll({});
             if (data && data.length > 0) {
                 data.map((item) => {
                     item.image = new Buffer(item.image, 'base64').toString('binary');
@@ -47,7 +54,7 @@ let getAllSpecialtyService = () => {
         }
     });
 };
-let getDetailSpecialtyByIdService = (id, location) => {
+let getDetailClinicByIdService = (id, location) => {
     return new Promise(async (res, rej) => {
         try {
             if (!id || !location) {
@@ -57,33 +64,24 @@ let getDetailSpecialtyByIdService = (id, location) => {
                 });
             } else {
                 let data = {};
-                data.data = await db.Specialty.findOne({
+                data.data = await db.Clinic.findOne({
                     where: {
                         id,
                     },
-                    attributes: ['descriptionHTML', 'descriptionMarkdown'],
+                    attributes: ['name', 'address', 'descriptionHTML', 'descriptionMarkdown'],
                 });
 
                 if (data.data) {
-                    let doctorSpecialty = [];
-                    if (location == 'ALL') {
-                        doctorSpecialty = await db.Doctor_Info.findAll({
-                            where: {
-                                specialtyId: id,
-                            },
-                            attributes: ['doctorId', 'provinceId'],
-                        });
-                    } else {
-                        doctorSpecialty = await db.Doctor_Info.findAll({
-                            where: {
-                                specialtyId: id,
-                                provinceId: location,
-                            },
-                            attributes: ['doctorId', 'provinceId'],
-                        });
-                    }
+                    let doctorClinic = [];
 
-                    data.doctorSpecialty = doctorSpecialty;
+                    doctorClinic = await db.Doctor_Info.findAll({
+                        where: {
+                            clinicId: id,
+                        },
+                        attributes: ['doctorId', 'provinceId'],
+                    });
+
+                    data.doctorClinic = doctorClinic;
                 } else data = {};
 
                 res({
@@ -98,7 +96,7 @@ let getDetailSpecialtyByIdService = (id, location) => {
     });
 };
 module.exports = {
-    createSpecialtyService,
-    getAllSpecialtyService,
-    getDetailSpecialtyByIdService,
+    createClinicService,
+    getAllClinicService,
+    getDetailClinicByIdService,
 };

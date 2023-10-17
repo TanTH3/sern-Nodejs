@@ -6,12 +6,10 @@ import { v4 as uuidv4 } from 'uuid';
 let buildUrlEmail = (doctorId, token) => {
     let result = `http://${process.env.URL_REACT}/verify-booking?token=${token}&doctorId=${doctorId}`;
 
-    console.log('asdasd', result);
     return result;
 };
 
 let postBookAppointmentService = (inputData) => {
-    console.log('1231232123', inputData);
     return new Promise(async (res, rej) => {
         try {
             if (!inputData.doctorId || !inputData.email || !inputData.timeType || !inputData.date) {
@@ -35,9 +33,11 @@ let postBookAppointmentService = (inputData) => {
                     defaults: {
                         email: inputData.email,
                         roleId: 'R3',
+                        gender: inputData.selectedGender,
+                        address: inputData.address,
+                        firstName: inputData.fullName,
                     },
                 });
-                console.log(user, user[0]);
                 if (user && user[0]) {
                     await db.Booking.findOrCreate({
                         where: { token },
@@ -51,6 +51,11 @@ let postBookAppointmentService = (inputData) => {
                         },
                     });
                 }
+                await db.Schedule.create({
+                    date: inputData.date,
+                    timeType: inputData.timeType,
+                    doctorId: inputData.doctorId,
+                });
                 res({
                     errCode: 0,
                     errMessage: 'Save info Doctor',

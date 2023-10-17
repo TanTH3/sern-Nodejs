@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
             maxNumber: DataTypes.INTEGER,
             date: DataTypes.STRING,
             timeType: DataTypes.STRING,
+            isSelected: DataTypes.STRING,
             doctorId: DataTypes.INTEGER,
         },
         {

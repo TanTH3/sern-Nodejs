@@ -22,7 +22,7 @@ let handleUserLogin = (email, password) => {
             if (isExit) {
                 // user already exits
                 let user = await db.User.findOne({
-                    attributes: ['email', 'roleId', 'password', 'firstName', 'lastName'],
+                    attributes: ['id', 'email', 'roleId', 'password', 'firstName', 'lastName'],
                     where: { email: email },
                     raw: true,
                 });
@@ -98,7 +98,6 @@ let getAllUsers = (userId) => {
 
 let createNewUser = (data) => {
     return new Promise(async (res, rej) => {
-        console.log(456, data);
         try {
             if (!data.roleId || !data.positionId || !data.gender) {
                 res({

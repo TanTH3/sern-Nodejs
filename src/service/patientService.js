@@ -10,6 +10,7 @@ let buildUrlEmail = (doctorId, token) => {
 };
 
 let postBookAppointmentService = (inputData) => {
+    console.log(inputData);
     return new Promise(async (res, rej) => {
         try {
             if (!inputData.doctorId || !inputData.email || !inputData.timeType || !inputData.date) {

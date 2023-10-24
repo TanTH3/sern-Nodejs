@@ -248,7 +248,7 @@ let getDetailDoctorByIdService = (id) => {
                 });
 
                 if (data && data.image) {
-                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                    data.image = Buffer.from(data.image, 'base64').toString('binary');
                 }
                 if (!data) data = {};
                 res({
@@ -409,7 +409,7 @@ let getProfileDoctorByIdService = (doctorId) => {
                     nest: true,
                 });
                 if (data && data.image) {
-                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                    data.image = Buffer.from(data.image, 'base64').toString('binary');
                 }
                 if (!data) data = {};
 
@@ -479,8 +479,8 @@ let sendRemedyService = (inputData) => {
                     where: {
                         doctorId: inputData.doctorId,
                         patientId: inputData.patientId,
-                        timeType: inputData.doctorId,
-                        statusId: 'S2',
+                        timeType: inputData.timeType,
+                        date: inputData.date,
                     },
                     raw: false,
                 });

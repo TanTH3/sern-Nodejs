@@ -140,6 +140,7 @@ let deleteUser = (id) => {
     return new Promise(async (res, rej) => {
         let user = await db.User.findOne({
             where: { id },
+            raw: false,
         });
         if (!user) {
             res({
@@ -160,6 +161,7 @@ let editUser = (data) => {
         try {
             let user = await db.User.findOne({
                 where: { id: data.id },
+                raw: false,
             });
             if (user) {
                 user.firstName = data.firstName;
@@ -172,6 +174,7 @@ let editUser = (data) => {
                 if (data.avatar) {
                     user.image = data.avatar;
                 }
+
                 await user.save();
 
                 res({
@@ -181,13 +184,14 @@ let editUser = (data) => {
             } else {
                 res({
                     errCode: 1,
-                    errMessage: `user's not found`,
+                    errMessage: `user's not found 123`,
                 });
             }
         } catch (e) {
+            console.log(e);
             rej({
                 errCode: 1,
-                errMessage: `user's not found`,
+                errMessage: `user's not found 312`,
             });
         }
     });

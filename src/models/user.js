@@ -28,11 +28,12 @@ module.exports = (sequelize, DataTypes) => {
             roleId: DataTypes.STRING,
             phoneNumber: DataTypes.STRING,
             positionId: DataTypes.STRING,
-            image: DataTypes.STRING,
+            image: DataTypes.TEXT,
         },
         {
             sequelize,
             modelName: 'User',
+            freezeTableName: true,
         },
     );
     return User;

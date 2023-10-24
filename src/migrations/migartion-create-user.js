@@ -29,6 +29,9 @@ module.exports = {
             roleId: {
                 type: Sequelize.STRING,
             },
+            image: {
+                type: Sequelize.BLOB('long'),
+            },
             phoneNumber: {
                 type: Sequelize.STRING,
             },

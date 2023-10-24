@@ -54,9 +54,18 @@ let handleDeleteUser = async (req, res) => {
     let message = await userService.deleteUser(req.body.id);
     return res.status(200).json(message);
 };
+
 let handleEditUser = async (req, res) => {
-    let message = await userService.editUser(req.body);
-    return res.status(200).json(message);
+    try {
+        let message = await userService.editUser(req.body);
+        return res.status(200).json(message);
+    } catch (e) {
+        console.log(e);
+        return res.status(200).json({
+            errCode: -1,
+            message: 'Error from server ...',
+        });
+    }
 };
 let getAllCode = async (req, res) => {
     try {
